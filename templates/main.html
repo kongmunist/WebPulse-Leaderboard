@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block headextra %}
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<script src="{{url_for('static', filename='copy.js')}}"></script>
+
+
+{% endblock %}
+
+
+{% block body %}
+yepp
+
+
+    <div class="container">
+        <canvas id="output"></canvas>
+        <video hidden autoplay></video>
+    </div>
+
+
+{% endblock %}
