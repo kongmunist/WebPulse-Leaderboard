@@ -1,6 +1,7 @@
 var ctx
 var canvas
 var video
+var frameSumArr = []
 
 function onCapabilitiesReady(capabilities) {
   console.log(capabilities);
@@ -38,7 +39,6 @@ async function loadCanvas(){
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     ctx = canvas.getContext('2d');
-
     drawWebcam();
     pollctx();
 }
@@ -51,7 +51,17 @@ function drawWebcam(){
 
 // vv This one's for you Jer bear vv
 function pollctx(){
-    console.log(ctx);
+    // Get Image data from canvas
+    videoData = ctx.getImageData(0, 0, video.videoWidth, video.videoHeight).data;
+    // Sum pixels of video data
+    videoDataSum = videoData.reduce((a, b) => a + b, 0);
+    console.log(videoDataSum);
+
+    // Add sum to array
+    frameSumArr.push(videoDataSum);
+    console.log(frameSumArr);
+
+    // Get next animation
     requestAnimationFrame(pollctx);
 }
 
