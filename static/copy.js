@@ -3,6 +3,34 @@ var canvas
 var video
 var frameSumArr = []
 
+// Canvas stuff
+var myChart
+
+// FFT stuff
+var fftr1
+var arrLen = 64
+
+function drawToCanvas(element_id, data) {
+  const element = document.getElementById(element_id);
+  const width = element.clientWidth;
+  const height = element.clientHeight;
+  const n = data.length;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  element.appendChild(canvas);
+
+  const context = canvas.getContext('2d');
+  context.strokeStyle = 'blue';
+  context.beginPath();
+  data.forEach((c_value, i) => {
+    context.lineTo(i * width / n, height/2 * (1.5 - c_value.real));
+  });
+  context.stroke();
+}
+
+
 function onCapabilitiesReady(capabilities) {
   console.log(capabilities);
 }
@@ -55,23 +83,89 @@ function pollctx(){
     videoData = ctx.getImageData(0, 0, video.videoWidth, video.videoHeight).data;
     // Sum pixels of video data
     videoDataSum = videoData.reduce((a, b) => a + b, 0);
-    console.log(videoDataSum);
+    videoDataSum = videoDataSum/(video.videoWidth*video.videoHeight*120)
+//    console.log(videoDataSum);
 
     // Add sum to array
     frameSumArr.push(videoDataSum);
-    console.log(frameSumArr);
+    if (frameSumArr.length > arrLen){
+        frameSumArr.shift()
+//        tmp = fftr1.forward(frameSumArr)
+
+        updateChart(myChart, frameSumArr)
+        console.log(frameSumArr)
+    } else{
+        console.log(frameSumArr.length)
+    }
+
 
     // Get next animation
     requestAnimationFrame(pollctx);
 }
 
 
+function updateChart(chart, datas){
+    chart.data.datasets = [{
+            label: 'FFT Maybe',
+            data: datas,
+
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }];
+    chart.update();
+}
+
 //function sumImage()
 
 async function main() {
     // Set up camera
     await setupCamera();
+    fftr1 = new window.kiss.FFTR(arrLen);
 
+
+
+
+
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [...Array(arrLen).keys()],
+        datasets: [{
+            label: 'FFT Maybe',
+
+            data: [12, 19, 3, 5, 2, 3],
+
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }]
+        }
+    }
+});
 
 }
 

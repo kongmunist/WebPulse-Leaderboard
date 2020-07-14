@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block headextra %}
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
+
+<script src="{{url_for('static', filename='fft.js')}}"></script>
 <script src="{{url_for('static', filename='copy.js')}}"></script>
+
 
 
 {% endblock %}
@@ -12,6 +16,7 @@
 {% block body %}
 yepp
 
+    <canvas id="myChart" width="100%"></canvas>
 
     <div class="container">
         <canvas id="output"></canvas>
