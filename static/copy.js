@@ -83,7 +83,7 @@ function pollctx(){
     videoData = ctx.getImageData(0, 0, video.videoWidth, video.videoHeight).data;
     // Sum pixels of video data
     videoDataSum = videoData.reduce((a, b) => a + b, 0);
-    videoDataSum = videoDataSum/(video.videoWidth*video.videoHeight*120)
+    videoDataSum = videoDataSum/(video.videoWidth*video.videoHeight*255*3)
 //    console.log(videoDataSum);
 
     // Add sum to array
@@ -93,14 +93,16 @@ function pollctx(){
 //        tmp = fftr1.forward(frameSumArr)
 
         updateChart(myChart, frameSumArr)
-        console.log(frameSumArr)
+        console.log(videoDataSum)
     } else{
         console.log(frameSumArr.length)
     }
 
 
     // Get next animation
+
     requestAnimationFrame(pollctx);
+    myChart.update(); // This position prevents the graph from jumping
 }
 
 
@@ -119,7 +121,7 @@ function updateChart(chart, datas){
             ],
             borderWidth: 1
         }];
-    chart.update();
+
 }
 
 //function sumImage()
@@ -159,8 +161,8 @@ async function main() {
         scales: {
             yAxes: [{
                 ticks: {
-                    beginAtZero: true,
-                    max: 1
+                    max: .3,
+                    min: .28
                 }
             }]
         }
