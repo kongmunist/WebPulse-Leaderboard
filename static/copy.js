@@ -10,6 +10,17 @@ var myChart
 var fftr1
 var arrLen = 64
 
+// normalization
+var cropSize = 100;
+var normFactor = 1/(cropSize*cropSize*25);
+var filter = Array.prototype.filter.call.bind(Array.prototype.filter)
+var t0 = performance.now();
+
+// Getting frequency
+var times = [];
+var timesLen = 10;
+var curPollFreq;
+
 function drawToCanvas(element_id, data) {
   const element = document.getElementById(element_id);
   const width = element.clientWidth;
@@ -71,29 +82,41 @@ async function loadCanvas(){
     pollctx();
 }
 
-function drawWebcam(){
+async function drawWebcam(){
     ctx.drawImage(video,0,0,video.videoWidth,video.videoHeight);
     requestAnimationFrame(drawWebcam);
 }
 
 
-// vv This one's for you Jer bear vv
-function pollctx(){
+// Use with below code to get only red, maybe improve SNR
+//    videoDataSum = filter(videoData, everyFourth)
+//        .reduce((a, b) => a + b, 0);
+
+function everyFourth(elem, i) {
+    return (i-2) % 4 == 0
+
+}
+
+async function pollctx(){
+    t0 = performance.now();
     // Get Image data from canvas
-    videoData = ctx.getImageData(0, 0, video.videoWidth, video.videoHeight).data;
+    videoData = ctx.getImageData(100, 100, cropSize, cropSize).data;
+
     // Sum pixels of video data
     videoDataSum = videoData.reduce((a, b) => a + b, 0);
-    videoDataSum = videoDataSum/(video.videoWidth*video.videoHeight*255*3)
+    videoDataSum -= cropSize*cropSize*255 // remove alpha
+    videoDataSum = videoDataSum*normFactor;
+
 //    console.log(videoDataSum);
 
-    // Add sum to array
+        // Add sum to array
     frameSumArr.push(videoDataSum);
     if (frameSumArr.length > arrLen){
         frameSumArr.shift()
-//        tmp = fftr1.forward(frameSumArr)
 
+        // Calculate the FFT and update the chart
+//        calcFFT();
         updateChart(myChart, frameSumArr)
-        console.log(videoDataSum)
     } else{
         console.log(frameSumArr.length)
     }
@@ -101,9 +124,21 @@ function pollctx(){
 
     // Get next animation
 
+    times.push(performance.now()-t0);
+    if (times.length > timesLen){
+        times.shift();
+        curPollFreq = times.reduce((a, b) => a + b, 0)/timesLen;
+    }
+    t0 = performance.now();
     requestAnimationFrame(pollctx);
     myChart.update(); // This position prevents the graph from jumping
 }
+
+async function calcFFT(){
+    tmp = fftr1.forward(frameSumArr)
+    console.log(tmp);
+}
+
 
 
 function updateChart(chart, datas){
@@ -129,6 +164,9 @@ function updateChart(chart, datas){
 async function main() {
     // Set up camera
     await setupCamera();
+
+
+
     fftr1 = new window.kiss.FFTR(arrLen);
 
 
@@ -161,14 +199,13 @@ async function main() {
         scales: {
             yAxes: [{
                 ticks: {
-                    max: .3,
-                    min: .28
+                    max: .2,
+                    min: 0
                 }
             }]
         }
     }
-});
-
+    });
 }
 
 main();
