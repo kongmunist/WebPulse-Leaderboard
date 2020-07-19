@@ -8,7 +8,8 @@ var myChart
 
 // FFT stuff
 var fftr1
-var arrLen = 64
+var arrLen = 256
+var maxInd, maxVal
 
 // normalization
 var cropSize = 100;
@@ -18,8 +19,12 @@ var t0 = performance.now();
 
 // Getting frequency
 var times = [];
-var timesLen = 10;
+var timesLen = arrLen/4;
 var curPollFreq;
+
+// Heartrate
+var heartrate
+
 
 function drawToCanvas(element_id, data) {
   const element = document.getElementById(element_id);
@@ -115,8 +120,8 @@ async function pollctx(){
         frameSumArr.shift()
 
         // Calculate the FFT and update the chart
-//        calcFFT();
-        updateChart(myChart, frameSumArr)
+        calcFFT();
+//        updateChart(myChart, frameSumArr)
     } else{
         console.log(frameSumArr.length)
     }
@@ -127,7 +132,16 @@ async function pollctx(){
     times.push(performance.now()-t0);
     if (times.length > timesLen){
         times.shift();
-        curPollFreq = times.reduce((a, b) => a + b, 0)/timesLen;
+        curPollFreq = 1/(times.reduce((a, b) => a + b, 0)/timesLen/1000);
+
+        heartrate = maxInd*curPollFreq/arrLen*30/2
+        console.log(heartrate)
+        heartrateIndicator = document.getElementById('heartrate')
+        heartrateIndicator.textContent = "Predicted: " + heartrate
+
+//        console.log(curPollFreq)
+
+
     }
     t0 = performance.now();
     requestAnimationFrame(pollctx);
@@ -135,8 +149,21 @@ async function pollctx(){
 }
 
 async function calcFFT(){
-    tmp = fftr1.forward(frameSumArr)
-    console.log(tmp);
+    tmp = fftr1.forward(frameSumArr);
+
+    maxVal = 0;
+    maxInd = 0;
+
+    tmp.forEach((item, index, arr) => { // Find peaks past the meyer wave and DC noise freqs
+        arr[index] = Math.abs(item)
+        if (index > 8 && arr[index] > maxVal){
+            maxInd = index
+            maxVal = arr[index]
+        }
+    })
+    updateChart(myChart, tmp.slice(1))
+
+    console.log(maxInd);
 }
 
 
@@ -199,8 +226,9 @@ async function main() {
         scales: {
             yAxes: [{
                 ticks: {
-                    max: .2,
-                    min: 0
+//                    max: .2,
+                    max: 1,
+                    min: -1
                 }
             }]
         }

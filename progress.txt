@@ -2,4 +2,4 @@ July 18
 added frequency monitoring and got better SNR by removing alpha channel.
 
 TODO:
-calculate FFT and the frequency bins based on the curFreq variable. 
+calculate FFT and the frequency bins based on the curFreq variable.
