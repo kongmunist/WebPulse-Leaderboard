@@ -1,19 +1,58 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-174588049-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-{% block headextra %}
+  gtag('config', 'UA-174588049-1');
+</script>
+
+
+
+
+    <meta charset="UTF-8">
+    <title>Heartrate Leaderboard</title>
+    
 <!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
 
-<script src="{{url_for('static', filename='fft.js')}}"></script>
-<script src="{{url_for('static', filename='copy.js')}}"></script>
+<script src="/static/fft.js"></script>
+<script src="/static/copy.js"></script>
 
 
 
-{% endblock %}
 
 
-{% block body %}
+    <style>
+    body {
+        font: 16px Verdana, sans-serif;
+    }
+
+    .dot{
+        width: 52px;
+        height: 52px;
+        background-color: #f00;
+        border-radius: 50%;
+        position: fixed;
+    }
+    
+    .predicdot{
+        width: 30px;
+        height: 30px;
+        background-color: #ffab56;
+        border-radius: 50%;
+        position:fixed;
+    }
+    </style>
+
+</head>
+<body style="background-color:powderblue;">
+
 
 
 
@@ -48,8 +87,8 @@
 </p>
 
 <h3>For more like this: </h3>
-Visit my <a href="https://andykong.org/" target="_blank">personal site</a>!
+Visit my <a href="https://andykong.org/" target="_blank">personal site</a>
 
-<br>
 
-{% endblock %}
+</body>
+</html>

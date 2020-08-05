@@ -1,3 +1,9 @@
+Aug 4/5
+Fixed up the site to look nicer, wrote instructions, added smoothing, wrote explanation for effect, added link to my personal site.
+Uploaded to netlify
+Got it working on mobile (need to run video.play() in order to get it to work on Safari, autoplay alone doesn't cut it).
+
+
 July 18
 added frequency monitoring and got better SNR by removing alpha channel.
 
